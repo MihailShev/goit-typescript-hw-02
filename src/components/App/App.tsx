@@ -3,7 +3,7 @@ import ImageGallery from "../ImageGallery/ImageGallery";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
 import Loader from "../Loader/Loader";
-import { fetchSearchPhoto } from "../../js/fetch-api";
+import { fetchSearchPhoto } from "../../js/fetch-api.";
 import { useEffect, useState } from "react";
 import ImageModal from "../ImageModal/ImageModal";
 
