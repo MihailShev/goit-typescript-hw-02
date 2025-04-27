@@ -16,11 +16,11 @@ const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, photo }) => {
       >
         {photo && (
           <div className={css.wrap_desc}>
-            <img src={photo.urlRegular} alt={photo.alt_description} />
+            <img src={photo.urlRegular} alt={photo.name} />
 
             <p>
               <b>Description:</b>
-              {photo.descriptio ? photo.descriptio : " Whoops no results"},
+              {photo.description ? photo.description : " Whoops no results"},
             </p>
             <p>
               <b>likes:</b> {photo.likes},
