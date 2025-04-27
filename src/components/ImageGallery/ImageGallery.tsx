@@ -1,16 +1,21 @@
-import css from "./ImageGallery.module.css";
 import ImageCard from "../ImageCard/ImageCard";
+import css from "./ImageGallery.module.css";
 
-function ImageGallery({ openModal, photos }) {
+import { GalleryProps } from "./ImageGallery.types";
+
+const ImageGallery: React.FC<GalleryProps> = ({ gallery, onOpen }) => {
   return (
-    <ul className={css.wrap_img}>
-      {photos.map((photo) => (
-        <li key={photo.id} onClick={() => openModal(photo)}>
-          <ImageCard photo={photo} />
+    <ul className={css.ul}>
+      {gallery.map((galleryEl) => (
+        <li
+          className={css.li}
+          key={galleryEl.id + Math.random() * 10}
+          onClick={() => onOpen(galleryEl)}
+        >
+          <ImageCard card={galleryEl} />
         </li>
       ))}
     </ul>
   );
-}
-
+};
 export default ImageGallery;

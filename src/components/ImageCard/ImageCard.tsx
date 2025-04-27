@@ -1,16 +1,23 @@
-// import css from "./ImageCard.module.css";
+import css from "./ImageCard.module.css";
+import { CardProps } from "./ImageCard.types";
 
-function ImageCard({
-  photo: {
-    alt_description,
-    urls: { small },
-  },
-}) {
+const ImageCard: React.FC<CardProps> = ({ card }) => {
   return (
-    <div>
-      <img width={300} height={250} src={small} alt={alt_description} />
+    <div className={css.card}>
+      <div className={css.imageDiv}>
+        <img src={card.urlSmall} alt={card.description || "photo"} />
+      </div>
+      <div className={css.info}>
+        <p className={css.p}>
+          <span className={css.title}>Likes: </span>
+          <span>{card.likes}</span>
+        </p>
+        <p className={css.p}>
+          <span className={css.title}>Autor: </span>
+          <span>{card.name}</span>
+        </p>
+      </div>
     </div>
   );
-}
-
+};
 export default ImageCard;

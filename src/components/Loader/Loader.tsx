@@ -1,21 +1,19 @@
+import PacmanLoader from "react-spinners/PacmanLoader";
 import css from "./Loader.module.css";
-import { RotatingLines } from "react-loader-spinner";
+import { LoaderProps } from "./Loader.types";
 
-function Loader({ loader }) {
+const Loader: React.FC<LoaderProps> = ({ loading }) => {
   return (
     <div className={css.wrap_loader}>
-      <RotatingLines
-        visible={loader}
-        height="100"
-        width="100"
-        strokeColor="black"
-        strokeWidth="4"
-        animationDuration="0.75"
-        ariaLabel="rotating-lines-loading"
-        wrapperStyle={{}}
-        wrapperClass=""
+      <PacmanLoader
+        color="grey"
+        loading={loading}
+        size={20}
+        aria-label="Loading Spinner"
+        data-testid="loader"
       />
     </div>
   );
-}
+};
+
 export default Loader;

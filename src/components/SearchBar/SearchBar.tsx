@@ -1,39 +1,43 @@
 import css from "./SearchBar.module.css";
+import { useState, FormEvent } from "react";
+import { SearchBarProps } from "./SearcBar.types";
 
-import toast, { Toaster } from "react-hot-toast";
+const SearchBar: React.FC<SearchBarProps> = ({ onSubmit, topic }) => {
+  const [query, setQuery] = useState<string>(topic);
 
-function SearchBar({ onSubmit }) {
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const value = e.target.elements.userSearchQuery.value.trim();
+    const searchForm = e.target as HTMLFormElement;
+    const formElements = searchForm.elements as typeof searchForm.elements & {
+      search: HTMLInputElement;
+    };
 
-    if (value === "") {
-      return toast.error("Please enter the meaning.");
-    }
-
-    onSubmit(value);
-
-    e.target.reset();
+    const search = formElements.search.value.trim();
+    onSubmit(search);
   };
 
   return (
     <header className={css.header}>
       <form className={css.form} onSubmit={handleSubmit}>
-        <Toaster position="top-right" reverseOrder={false} />
         <input
           className={css.input}
           type="text"
-          name="userSearchQuery"
+          name="search"
           autoComplete="off"
           autoFocus
           placeholder="Search images and photos"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setQuery("")}
         />
+
         <button className={css.button} type="submit">
           Search
         </button>
       </form>
     </header>
   );
-}
+};
+
 export default SearchBar;

@@ -1,82 +1,113 @@
+import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import SearchBar from "../SearchBar/SearchBar";
+import Loader from "../Loader/Loader";
 import ImageGallery from "../ImageGallery/ImageGallery";
+import { getGalleryByQuery } from "../../fetch/fetch-api.";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
-import Loader from "../Loader/Loader";
-import { fetchSearchPhoto } from "../../js/fetch-api.";
-import { useEffect, useState } from "react";
 import ImageModal from "../ImageModal/ImageModal";
+import css from "./App.module.css";
+import { Card, FetchData } from "./App.types";
 
 function App() {
-  const [photos, setPhotos] = useState([]);
-  const [loader, setLoader] = useState(false);
-  const [error, setError] = useState(false);
-  const [userValue, setUserValue] = useState("");
-  const [page, setPage] = useState(1);
-  const [modal, setModal] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [topic, setTopic] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [gallery, setGallery] = useState<Card[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [currentCard, setCurrentCard] = useState<Card | null>(null);
 
-  useEffect(() => {
-    if (!userValue) {
+  const searchGallery = (query: string): void => {
+    if (query === "") {
+      toast("Please, enter word for searching");
       return;
     }
+    setError(false);
+    setTopic(query);
+    setPage(1);
+    setGallery([]);
+  };
 
-    async function fetchPhotos() {
+  const addPage = (): void => {
+    return setPage(page + 1);
+  };
+
+  const openModal = (card: Card): void => {
+    setIsOpen(true);
+    setCurrentCard(card);
+  };
+
+  const closeModal = (): void => {
+    setIsOpen(false);
+    setCurrentCard(null);
+  };
+
+  useEffect(() => {
+    if (topic === "") {
+      return;
+    }
+    async function getData() {
       try {
+        setLoading(true);
         setError(false);
-        setLoader(true);
-        const results = await fetchSearchPhoto(userValue, page);
-
-        if (page === 1) {
-          setPhotos(results);
-        } else {
-          setPhotos((prevPhoto) => [...prevPhoto, ...results]);
+        const data: FetchData = await getGalleryByQuery<FetchData>(topic, page);
+        if (data.results.length === 0) {
+          toast("Nothing found for your request");
+          return;
         }
-      } catch (error) {
+
+        const dataArray = data.results.map(
+          ({
+            id,
+            likes,
+            urls: { small, regular },
+            user: { name },
+            alt_description,
+          }) => ({
+            id,
+            likes,
+            urlSmall: small,
+            urlRegular: regular,
+            name: name,
+            description: alt_description,
+          })
+        );
+        setGallery((prevData) => {
+          return [...prevData, ...dataArray];
+        });
+      } catch {
         setError(true);
-        console.log(error);
+        setTopic("");
       } finally {
-        setLoader(false);
+        setLoading(false);
       }
     }
-
-    fetchPhotos();
-  }, [userValue, page]);
-
-  const closeModal = () => {
-    setModal(false);
-    setSelectedPhoto(null);
-  };
-
-  const openModal = (photo) => {
-    setSelectedPhoto(photo);
-    setModal(true);
-  };
-
-  const handleUserValue = (newValue) => {
-    setUserValue(newValue);
-    setPage(1);
-    setPhotos([]);
-  };
-
-  const handleMoreBtn = () => setPage(page + 1);
+    getData();
+  }, [page, topic]);
 
   return (
-    <>
-      <SearchBar onSubmit={handleUserValue} />
+    <div className={css.container}>
+      <SearchBar onSubmit={searchGallery} topic={topic} />
 
-      {error ? (
-        <ErrorMessage />
+      {gallery.length > 0 ? (
+        <ImageGallery gallery={gallery} onOpen={openModal} />
       ) : (
-        <ImageGallery openModal={openModal} photos={photos} />
+        error && <ErrorMessage message="Something went wrong, try again" />
       )}
 
-      {photos.length === 0 ? "" : <LoadMoreBtn onClick={handleMoreBtn} />}
+      <Loader loading={loading} />
+      {gallery.length > 0 && <LoadMoreBtn onClick={addPage} />}
 
-      <Loader loader={loader} />
+      <ImageModal isOpen={isOpen} onClose={closeModal} photo={currentCard} />
 
-      <ImageModal isOpen={modal} onClose={closeModal} photo={selectedPhoto} />
-    </>
+      <Toaster
+        containerStyle={{
+          top: 30,
+        }}
+      />
+    </div>
   );
 }
 

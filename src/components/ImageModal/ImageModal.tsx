@@ -2,7 +2,9 @@ import css from "./ImageModal.module.css";
 import Modal from "react-modal";
 Modal.setAppElement("#root");
 
-function ImageModal({ isOpen, onClose, photo }) {
+const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, photo }) => {
+  console.log(photo);
+  if (!photo) return;
   return (
     <>
       <Modal
@@ -13,7 +15,8 @@ function ImageModal({ isOpen, onClose, photo }) {
       >
         {photo && (
           <div className={css.wrap_desc}>
-            <img src={photo.urls.regular} alt={photo.alt_description} />
+            <img src={photo.urlRegular} alt={photo.alt_description} />
+
             <p>
               <b>Description:</b>
               {photo.descriptio ? photo.descriptio : " Whoops no results"},
@@ -29,6 +32,6 @@ function ImageModal({ isOpen, onClose, photo }) {
       </Modal>
     </>
   );
-}
+};
 
 export default ImageModal;
